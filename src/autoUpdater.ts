@@ -1,20 +1,17 @@
-import axios, { AxiosError } from 'axios'
-import { pipeline } from 'stream'
-import os from 'os'
+import axios from 'axios'
 import {
   app,
   autoUpdater as electronAutoUpdater,
   BrowserWindow,
-  ipcMain,
-  IpcMainEvent,
-  IpcMainInvokeEvent,
+  ipcMain
 } from 'electron'
 import isDev from 'electron-is-dev'
-import fs from 'fs'
-import path from 'path'
 import EventEmitter from 'events'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+import { gte as semverGte, rcompare as semverCompare } from 'semver'
 import { GithubRelease, GithubReleaseAsset } from './types'
-import { eq as semverEq, gt as semverGt, gte as semverGte, rcompare as semverCompare } from 'semver'
 
 // Platform validation
 const supportedPlatforms = ['darwin', 'win32'] as const
@@ -148,8 +145,7 @@ class ElectronGithubAutoUpdater extends EventEmitter {
     ipcMain.handle(channelName, async (event, method, args) => {
       switch (method) {
         case 'checkForUpdates':
-          this.checkForUpdates()
-          return true
+          return this.checkForUpdates()
         case 'quitAndInstall':
           this.quitAndInstall()
           return true
@@ -404,6 +400,7 @@ class ElectronGithubAutoUpdater extends EventEmitter {
 
       if (semverGte(this.currentVersion, latestVersion)) {
         this.emit('update-not-available')
+        return false;
       } else {
         this.emit('update-available', {
           releaseName: latestRelease.name,
@@ -425,6 +422,7 @@ class ElectronGithubAutoUpdater extends EventEmitter {
           this._loadElectronAutoUpdater(latestRelease)
           // Use the built in electron auto updater to install the update
           this._installDownloadedUpdate()
+          return true;
         } else {
           if (electronAutoUpdater.getFeedURL() === this.platformConfig.feedUrl) {
             this.emit('update-downloaded')
@@ -433,6 +431,7 @@ class ElectronGithubAutoUpdater extends EventEmitter {
             this._loadElectronAutoUpdater(latestRelease)
             // Use the built in electron auto updater to install the update
             this._installDownloadedUpdate()
+            return true;
           }
         }
       }

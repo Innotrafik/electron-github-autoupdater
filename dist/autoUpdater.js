@@ -83,12 +83,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.autoUpdater = exports.channelName = void 0;
 var axios_1 = __importDefault(require("axios"));
-var os_1 = __importDefault(require("os"));
 var electron_1 = require("electron");
 var electron_is_dev_1 = __importDefault(require("electron-is-dev"));
-var fs_1 = __importDefault(require("fs"));
-var path_1 = __importDefault(require("path"));
 var events_1 = __importDefault(require("events"));
+var fs_1 = __importDefault(require("fs"));
+var os_1 = __importDefault(require("os"));
+var path_1 = __importDefault(require("path"));
 var semver_1 = require("semver");
 // Platform validation
 var supportedPlatforms = ['darwin', 'win32'];
@@ -148,9 +148,7 @@ var ElectronGithubAutoUpdater = /** @class */ (function (_super) {
                                 case 'getLatestRelease': return [3 /*break*/, 4];
                             }
                             return [3 /*break*/, 6];
-                        case 1:
-                            this.checkForUpdates();
-                            return [2 /*return*/, true];
+                        case 1: return [2 /*return*/, this.checkForUpdates()];
                         case 2:
                             this.quitAndInstall();
                             return [2 /*return*/, true];
@@ -422,7 +420,7 @@ var ElectronGithubAutoUpdater = /** @class */ (function (_super) {
                         latestVersion = latestRelease.tag_name;
                         if (!(0, semver_1.gte)(this.currentVersion, latestVersion)) return [3 /*break*/, 2];
                         this.emit('update-not-available');
-                        return [3 /*break*/, 5];
+                        return [2 /*return*/, false];
                     case 2:
                         this.emit('update-available', {
                             releaseName: latestRelease.name,
@@ -444,7 +442,7 @@ var ElectronGithubAutoUpdater = /** @class */ (function (_super) {
                         this._loadElectronAutoUpdater(latestRelease);
                         // Use the built in electron auto updater to install the update
                         this._installDownloadedUpdate();
-                        return [3 /*break*/, 5];
+                        return [2 /*return*/, true];
                     case 4:
                         if (electron_1.autoUpdater.getFeedURL() === this.platformConfig.feedUrl) {
                             this.emit('update-downloaded');
@@ -454,6 +452,7 @@ var ElectronGithubAutoUpdater = /** @class */ (function (_super) {
                             this._loadElectronAutoUpdater(latestRelease);
                             // Use the built in electron auto updater to install the update
                             this._installDownloadedUpdate();
+                            return [2 /*return*/, true];
                         }
                         _a.label = 5;
                     case 5: return [3 /*break*/, 7];

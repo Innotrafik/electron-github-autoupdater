@@ -60,7 +60,7 @@ declare class ElectronGithubAutoUpdater extends EventEmitter {
     emit: (e: AutoUpdaterEventType, args?: any) => boolean;
     downloadUpdateFromRelease: (release: GithubRelease) => Promise<void>;
     clearCache: () => void;
-    checkForUpdates: () => Promise<void>;
+    checkForUpdates: () => Promise<boolean | undefined>;
     quitAndInstall: () => void;
     destroy: () => void;
 }
