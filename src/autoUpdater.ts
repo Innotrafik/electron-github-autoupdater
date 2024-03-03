@@ -274,7 +274,7 @@ class ElectronGithubAutoUpdater extends EventEmitter {
 
     // Emit over IPC also
     if (this.shouldForwardEvents) {
-      BrowserWindow.getAllWindows().map((window) => {
+      BrowserWindow.getAllWindows().forEach((window) => {
         window.webContents.send(channelName, { eventName: e, eventDetails: args })
       })
     }
